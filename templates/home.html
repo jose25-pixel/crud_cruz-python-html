@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium CRUD - Flask</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="layout">
+            <section class="form-section">
+                {% if editing %}
+                    <h2>Update Record</h2>
+                    <form action="{{ url_for('home.update', record_id=editing.id) }}" method="POST">
+                        <input type="text" name="name" value="{{editing.name}}" placeholder="Full Name" required>
+                        <input type="email" name="email" value="{{editing.email}}" placeholder="Email Address" required>
+                        <input type="text" name="role" value="{{editing.role}}" placeholder="Role/Position">
+                        <button type="submit">Save Changes</button>
+                        <a href="{{ url_for('home.home') }}" style="text-align: center; margin-top: 0.5rem;">Cancel Update</a>
+                    </form>
+                {% else %}
+                    <h2>Create Record</h2>
+                    <form action="{{ url_for('home.create') }}" method="POST">
+                        <input type="text" name="name" placeholder="Full Name" required>
+                        <input type="email" name="email" placeholder="Email Address" required>
+                        <input type="text" name="role" placeholder="Role/Position">
+                        <button type="submit">Create Record</button>
+                    </form>
+                {% endif %}
+            </section>
+
+            <section class="table-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h2>Active Records</h2>
+                    <span style="color: var(--text-muted); font-size: 0.875rem;">Total: {{records|length}}</span>
+                </div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name & Email</th>
+                            <th>Role</th>
+                            <th style="text-align: right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if records %}
+                            {% for r in records %}
+                                <tr>
+                                    <td>
+                                        <div style="font-weight: 500;">{{r.name}}</div>
+                                        <div style="font-size: 0.75rem; color: var(--text-muted);">{{r.email}}</div>
+                                    </td>
+                                    <td><span style="opacity: 0.8;">{{r.role or 'N/A'}}</span></td>
+                                    <td style="text-align: right;">
+                                        <div class="actions" style="justify-content: flex-end;">
+                                            <a href="{{ url_for('home.edit', record_id=r.id) }}" class="edit-link">Edit</a>
+                                            <form action="{{ url_for('home.delete', record_id=r.id) }}" method="POST" style="margin: 0;">
+                                                <button type="submit" class="delete-btn">Delete</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="3" style="text-align: center; padding: 3rem 0; color: var(--text-muted);">
+                                    No records found. Create one to get started.
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </section>
+        </div>
+    </main>
+</body>
+</html>
